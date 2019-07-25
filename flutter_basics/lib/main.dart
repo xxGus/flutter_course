@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_basics/question.dart';
-import 'package:flutter_basics/answer.dart';
+import 'package:flutter_basics/quiz.dart';
+import 'package:flutter_basics/result.dart';
 
 void main() => runApp(MyApp());
 
@@ -14,44 +14,58 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  var _questionIndex = 0;
+  final _questions = const [
+    {
+      'questionText': 'What\'s your favorite color?',
+      'answer': [
+        {'text': 'Black', 'score': 10},
+        {'text': 'Red', 'score': 5},
+        {'text': 'Green', 'score': 3},
+        {'text': 'White', 'score': 1}
+      ]
+    },
+    {
+      'questionText': 'What\'s your favorite animal?',
+      'answer': [
+        {'text': 'Rabbit', 'score': 1},
+        {'text': 'Tiger', 'score': 5},
+        {'text': 'Lion', 'score': 3},
+        {'text': 'Snake', 'score': 1}
+      ]
+    },
+  ];
 
-  void _answareQuestion() {
+  var _questionIndex = 0;
+  var _totalScore = 0;
+
+  void _resetQuiz() {
+    setState(() {
+      _questionIndex = 0;
+      _totalScore = 0;
+    });
+  }
+
+  void _answareQuestion(int score) {
+    _totalScore += score;
+
     setState(() {
       _questionIndex = _questionIndex + 1;
     });
-    print('Answer Question!');
   }
 
   @override
   Widget build(BuildContext context) {
-    var questions = [
-      {
-        'questionText': 'What\'s your favorite color?',
-        'answer': ['Black', 'Red', 'Green', 'White']
-      },
-       
-      {
-        'questionText': 'What\'s your favorite animal?',
-        'answer': ['Rabbit', 'Tiger', 'Lion', 'Snake']
-      },
-    ];
-
     return MaterialApp(
         home: Scaffold(
       appBar: AppBar(
         title: Text('My First App'),
       ),
-      body: Column(
-        children: [
-          Question(
-            questions[_questionIndex]['questionText'],
-          ),
-          ...(questions[_questionIndex]['answer'] as List<String>).map((answer) {
-            return Answer(_answareQuestion, answer);
-          }).toList()
-        ],
-      ),
+      body: _questionIndex < _questions.length
+          ? Quiz(
+              answareQuestion: _answareQuestion,
+              questions: _questions,
+              questionIndex: _questionIndex)
+          : Result(_totalScore, _resetQuiz),
     ));
   }
 }
